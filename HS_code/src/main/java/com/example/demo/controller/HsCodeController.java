@@ -16,30 +16,30 @@ public class HsCodeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<HsCode> addHsCode(@RequestBody HsCode hsCode) {
+    public ResponseEntity<?> addHsCode(@RequestBody HsCode hsCode) {
         return hsCodeService.addHsCode(hsCode);
     }
 
     @GetMapping("/getall")
-    public List<HsCode> getAll() {
+    public ResponseEntity<?> getAll() {
         return hsCodeService.getAll();
     }
 
     @DeleteMapping("/drop")
-    public String dropTable() {
+    public ResponseEntity<String> dropTable() {
         return hsCodeService.dropTable();
     }
     @PostMapping("/create")
-    public String createTable() {
+    public ResponseEntity<String> createTable() {
         return hsCodeService.createTable();
     }
     @DeleteMapping("/delete/{id}")
-    public String deleteRow(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRow(@PathVariable Long id) {
         return hsCodeService.deleteRow(id);
     }
 
     @PutMapping("/update/{id}")
-    public String updateTable(@PathVariable Long id, @RequestBody HsCode hsCode) {
+    public ResponseEntity<String> updateTable(@PathVariable Long id, @RequestBody HsCode hsCode) {
         return hsCodeService.updateTable(id, hsCode);
     }
 }

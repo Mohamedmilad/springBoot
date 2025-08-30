@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.entity.HsCode;
 import com.example.demo.repository.HsCodeRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,17 +19,36 @@ public class HsCodeServiceImplementation implements HsCodeService {
         this.hsCodeRepository = hsCodeRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
-    public ResponseEntity<HsCode>  addHsCode(HsCode hsCode) {
+
+    public ResponseEntity<?>  addHsCode(HsCode hsCode) {
+        if (hsCode.getCode() == null || hsCode.getName() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Code and name cannot be NULL");
+        }
         return ResponseEntity.ok(hsCodeRepository.save(hsCode));
     }
-    public List<HsCode> getAll(){
-        return hsCodeRepository.findAll();
+
+    public ResponseEntity<?> getAll(){
+        try {
+            List<HsCode> hsCodes = hsCodeRepository.findAll();
+            if (hsCodes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No rows found in hsCode"); //404 not 204 to add a content
+            }
+            return ResponseEntity.ok(hsCodes);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while fetching the table"+e.getMessage());
+        }
     }
-    public String dropTable(){
-        jdbcTemplate.execute("DROP TABLE IF EXISTS hs_code");
-        return "Table 'hs_code' dropped successfully!";
+
+    public ResponseEntity<String> dropTable(){
+        try {
+            jdbcTemplate.execute("DROP TABLE IF EXISTS hs_code");
+            return ResponseEntity.ok("Table 'hs_code' dropped successfully!");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to drop table: " + e.getMessage());
+        }
     }
-    public String createTable(){
+
+    public ResponseEntity<String> createTable(){
         String sql = """
             CREATE TABLE IF NOT EXISTS hs_code (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,25 +58,44 @@ public class HsCodeServiceImplementation implements HsCodeService {
         )
             
         """;
-        jdbcTemplate.execute(sql);
-        return " Table 'hs_code' has been created.";
-    }
-    public String deleteRow(@PathVariable Long id){
+        try {
+            jdbcTemplate.execute(sql);
+            return ResponseEntity.ok(" Table 'hs_code' has been created.");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to Create table" + e.getMessage());
 
+        }
+    }
+
+    public ResponseEntity<String> deleteRow(@PathVariable Long id){
         if (!hsCodeRepository.existsById(id)) {
-            return "Row with ID=" + id + " doesn't exist in 'hs_code'";
+            return ResponseEntity.status(404).body("Row with ID=" + id + " doesn't exist in 'hs_code'");
         }
         hsCodeRepository.deleteById(id);
-        return "Row with ID=" + id + " in 'hs_code' deleted successfully!";
+        return ResponseEntity.ok("Row with ID=\" + id + \" in 'hs_code' deleted successfully!");
     }
-    public String updateTable(@PathVariable Long id, @RequestBody HsCode hsCode) {
+
+    public ResponseEntity<String> updateTable(@PathVariable Long id, @RequestBody HsCode hsCode) {
         if (!hsCodeRepository.existsById(id)) {
-            return "Row with ID=" + id + " doesn't exist in 'hs_code'";
+            return ResponseEntity.status(404).body("Row with ID=" + id + " doesn't exist in 'hs_code'");
         }
         HsCode hs = hsCodeRepository.findById(id).orElseThrow();
-        hs.setName(hsCode.getName());
-        hs.setCode(hsCode.getCode());
+        if (hsCode.getCode() == null && hsCode.getName() == null) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request
+        }
+        if (hsCode.getCode() == null ) {
+            hs.setName(hsCode.getName());
+            hs.setCode(hs.getCode());
+        } else if (hsCode.getName() == null) {
+            hs.setName(hs.getName());
+            hs.setCode(hsCode.getCode());
+        }
+        else {
+            hs.setName(hsCode.getName());
+            hs.setCode(hsCode.getCode());
+        }
         hsCodeRepository.save(hs);
-        return "ID " + id + " in 'hs_code' updated successfully!";
+        return ResponseEntity.ok("ID " + id + " in 'hs_code' updated successfully!");
     }
+
 }
