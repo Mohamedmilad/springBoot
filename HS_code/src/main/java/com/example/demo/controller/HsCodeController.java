@@ -1,9 +1,12 @@
 package com.example.demo.controller;
+import com.example.demo.dto.HsCodeDto;
+import com.example.demo.mapper.HsCodeMapper;
 import com.example.demo.service.HsCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.entity.HsCode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.MessageSource;
@@ -25,12 +28,13 @@ public class HsCodeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addHsCode(@RequestBody HsCode hsCode) {
+    public ResponseEntity<?> addHsCode(@RequestBody HsCodeDto hsCodeDto) {
+        HsCode hsCode= HsCodeMapper.mapToEntity(hsCodeDto);
         if (hsCode.getCode() == null || hsCode.getName() == null) {
             return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
         }
         try{
-            HsCode hs=hsCodeService.save(hsCode);
+            HsCodeDto hs=HsCodeMapper.mapToDto(hsCodeService.save(hsCode));
             return ResponseEntity.status(HttpStatus.CREATED).body(hs);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.invalid_request",e.getMessage()));
@@ -41,10 +45,16 @@ public class HsCodeController {
     public ResponseEntity<?> getAll() {
         try {
             List<HsCode> hsCodes = hsCodeService.getAll();
-            if (hsCodes.isEmpty()) {
+            List<HsCodeDto> result=new ArrayList<>();
+            for(HsCode hsCode : hsCodes) {
+                HsCodeDto hsCodeDto=HsCodeMapper.mapToDto(hsCode);
+                result.add(hsCodeDto);
+            }
+
+            if (result.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty")); //404 not 204 to add a content
             }
-            return ResponseEntity.ok(hsCodes);
+            return ResponseEntity.ok(result);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.invalid_request",e.getMessage()));
         }
@@ -64,29 +74,29 @@ public class HsCodeController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody HsCode hsCode) {
+    public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody HsCodeDto hsCodeDto) {
 
         Optional<HsCode> hsId = hsCodeService.findById(id);
         if(hsId.isEmpty()){
             return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
         }
         HsCode hs=hsId.get();
-        if (hsCode.getCode() == null && hsCode.getName() == null) {
+        if (hsCodeDto.getCode() == null && hsCodeDto.getName() == null) {
             return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
         }
-        if (hsCode.getCode() == null ) {
-            hs.setName(hsCode.getName());
+        if (hsCodeDto.getCode() == null ) {
+            hs.setName(hsCodeDto.getName());
             hs.setCode(hs.getCode());
-        } else if (hsCode.getName() == null) {
+        } else if (hsCodeDto.getName() == null) {
             hs.setName(hs.getName());
-            hs.setCode(hsCode.getCode());
+            hs.setCode(hsCodeDto.getCode());
         }
         else {
-            hs.setName(hsCode.getName());
-            hs.setCode(hsCode.getCode());
+            hs.setName(hsCodeDto.getName());
+            hs.setCode(hsCodeDto.getCode());
         }
         try{
-            HsCode hs_Code=hsCodeService.save(hs);
+            HsCodeDto hs_Code=HsCodeMapper.mapToDto(hsCodeService.save(hs));
             return ResponseEntity.status(HttpStatus.CREATED).body(hs_Code);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
