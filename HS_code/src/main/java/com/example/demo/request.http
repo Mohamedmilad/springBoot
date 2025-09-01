@@ -1,5 +1,3 @@
-# delete table
-#DELETE http://localhost:9090/hs/drop
 
 #delete row
 #DELETE http://localhost:9090/hs/delete/1
@@ -11,9 +9,6 @@
 #  "code": 123456,
 #  "name": "Updated Name"
 #}
-
-#Create table
-#POST http://localhost:9090/hs/create
 
 #Get table
 #GET http://localhost:9090/hs/getall
