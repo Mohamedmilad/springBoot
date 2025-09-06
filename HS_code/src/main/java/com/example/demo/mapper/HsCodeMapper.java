@@ -1,29 +1,28 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.HsCodeDto;
+import com.example.demo.dto.HsCodeDtoReq;
+import com.example.demo.dto.HsCodeDtoRes;
 import com.example.demo.entity.HsCode;
 
 public class HsCodeMapper {
-    public static HsCodeDto mapToDto(HsCode hsCode) {
+    public static HsCodeDtoRes mapToDto(HsCode hsCode) {
         if (hsCode == null) return null;
-        HsCodeDto dto =new HsCodeDto();
+        HsCodeDtoRes dto =new HsCodeDtoRes();
 
         dto.setId(hsCode.getId());
         dto.setCode(hsCode.getCode());
         dto.setName(hsCode.getName());
-        dto.setTimeStamp(hsCode.getTimestamp());
+        dto.setTimeStamp(hsCode.getTimeStamp());
 
         return dto;
     }
 
-    public static HsCode mapToEntity(HsCodeDto hsCodeDto) {
+    public static HsCode mapToEntity(HsCodeDtoReq hsCodeDto) {
         if (hsCodeDto == null) return null;
         HsCode hsCode = new HsCode();
 
-        hsCode.setId(hsCodeDto.getId());
         hsCode.setCode(hsCodeDto.getCode());
         hsCode.setName(hsCodeDto.getName());
-        hsCode.setTimestamp(hsCodeDto.getTimeStamp());
 
         return hsCode;
     }

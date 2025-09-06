@@ -1,39 +1,37 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Entity
-@Table(name = "hs_code")
-public class HsCode {
+@Table(name = "companies")
+public class Companies {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 64, nullable = false, unique = true)
-    private String code;
+    @Column(name="TAX_NUMBER",length = 64, nullable = false, unique = true)
+    private String taxNumber;
 
-    @Column(length = 3000, nullable = false)
+    @Column(name="NAME",length = 3000, nullable = false)
     private String name;
 
-    @CreationTimestamp
-    @Column(name = "timestamp", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "TIME_STAMP", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime timeStamp;
 
+    @Column(name="CHANGER_ID",nullable = false)
     private Long changer_id;
 
-//    not the owner
-    @OneToMany(mappedBy = "hsCode")
-    private List<BolDetails> bolDetails;
+    @OneToMany(mappedBy = "agent")
+    private List<BillOfLading> billsOfLading;
 
-    public HsCode() {}
+    public Companies() {}
 
-    public HsCode(String code, String name) {
-        this.code = code;
+    public Companies(String taxNumber, String name) {
+        this.taxNumber = taxNumber;
         this.name = name;
         this.timeStamp = LocalDateTime.now();
         Random random = new Random();
@@ -49,18 +47,19 @@ public class HsCode {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
+    public String getTaxNumber() { return taxNumber; }
+    public void setTaxNumber(String taxNumber) { this.taxNumber = taxNumber; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public LocalDateTime getTimeStamp() {return timeStamp;}
-    public void setTimeStamp(LocalDateTime timeStamp) {this.timeStamp = timeStamp;}
-
     public Long getChanger_id() {return changer_id;}
     public void setChanger_id(Long changer_id) {this.changer_id = changer_id;}
 
-    public List<BolDetails> getBolDetails() {return bolDetails;}
-    public void setBolDetails(List<BolDetails> bolDetails) {this.bolDetails = bolDetails;}
+    public LocalDateTime getTimeStamp() {return timeStamp;}
+    public void setTimeStamp(LocalDateTime timeStamp) {this.timeStamp = timeStamp;}
+
+    public List<BillOfLading> getBillsOfLading() {return billsOfLading;}
+    public void setBillsOfLading(List<BillOfLading> billsOfLading) {this.billsOfLading = billsOfLading;}
+
 }

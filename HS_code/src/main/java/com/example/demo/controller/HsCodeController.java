@@ -1,5 +1,6 @@
 package com.example.demo.controller;
-import com.example.demo.dto.HsCodeDto;
+import com.example.demo.dto.HsCodeDtoReq;
+import com.example.demo.dto.HsCodeDtoRes;
 import com.example.demo.mapper.HsCodeMapper;
 import com.example.demo.service.HsCodeService;
 import org.springframework.http.HttpStatus;
@@ -28,13 +29,13 @@ public class HsCodeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addHsCode(@RequestBody HsCodeDto hsCodeDto) {
+    public ResponseEntity<?> addHsCode(@RequestBody HsCodeDtoReq hsCodeDto) {
         HsCode hsCode= HsCodeMapper.mapToEntity(hsCodeDto);
         if (hsCode.getCode() == null || hsCode.getName() == null) {
             return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
         }
         try{
-            HsCodeDto hs=HsCodeMapper.mapToDto(hsCodeService.save(hsCode));
+            HsCodeDtoRes hs=HsCodeMapper.mapToDto(hsCodeService.save(hsCode));
             return ResponseEntity.status(HttpStatus.CREATED).body(hs);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.invalid_request",e.getMessage()));
@@ -45,9 +46,9 @@ public class HsCodeController {
     public ResponseEntity<?> getAll() {
         try {
             List<HsCode> hsCodes = hsCodeService.getAll();
-            List<HsCodeDto> result=new ArrayList<>();
+            List<HsCodeDtoRes> result=new ArrayList<>();
             for(HsCode hsCode : hsCodes) {
-                HsCodeDto hsCodeDto=HsCodeMapper.mapToDto(hsCode);
+                HsCodeDtoRes hsCodeDto=HsCodeMapper.mapToDto(hsCode);
                 result.add(hsCodeDto);
             }
 
@@ -74,7 +75,7 @@ public class HsCodeController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody HsCodeDto hsCodeDto) {
+    public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody HsCodeDtoReq hsCodeDto) {
 
         Optional<HsCode> hsId = hsCodeService.findById(id);
         if(hsId.isEmpty()){
@@ -95,8 +96,9 @@ public class HsCodeController {
             hs.setName(hsCodeDto.getName());
             hs.setCode(hsCodeDto.getCode());
         }
+        hs.setChanger_id(hs.getId());
         try{
-            HsCodeDto hs_Code=HsCodeMapper.mapToDto(hsCodeService.save(hs));
+            HsCodeDtoRes hs_Code=HsCodeMapper.mapToDto(hsCodeService.save(hs));
             return ResponseEntity.status(HttpStatus.CREATED).body(hs_Code);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
