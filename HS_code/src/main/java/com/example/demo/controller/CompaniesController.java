@@ -55,7 +55,7 @@ public class CompaniesController {
             }
 
             if (result.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty")); //404 not 204 to add a content
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty","Companies")); //404 not 204 to add a content
             }
             return ResponseEntity.ok(result);
         }catch (Exception e) {
@@ -66,13 +66,13 @@ public class CompaniesController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRow(@PathVariable Long id) {
         if (!companiesService.idExisted(id)) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Companies"));
         }
         try{
             companiesService.deleteRow(id);
-            return ResponseEntity.ok(msg("business.error.delete_success",id));
+            return ResponseEntity.ok(msg("business.error.delete_success",id,"Companies"));
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,"Companies",e.getMessage()));
         }
     }
 
@@ -81,7 +81,7 @@ public class CompaniesController {
 
         Optional<Companies> compaiesId = companiesService.findById(id);
         if(compaiesId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Companies"));
         }
         Companies companie=compaiesId.get();
 
@@ -105,7 +105,7 @@ public class CompaniesController {
             CompaniesDtoRes companiesRes=CompaniesMapper.mapToDto(companiesService.save(companie));
             return ResponseEntity.status(HttpStatus.CREATED).body(companiesRes);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error","Companies",e.getMessage()));
         }
     }
 }

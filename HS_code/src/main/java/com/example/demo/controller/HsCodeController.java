@@ -53,7 +53,7 @@ public class HsCodeController {
             }
 
             if (result.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty")); //404 not 204 to add a content
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty","Hs_Code")); //404 not 204 to add a content
             }
             return ResponseEntity.ok(result);
         }catch (Exception e) {
@@ -64,13 +64,13 @@ public class HsCodeController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRow(@PathVariable Long id) {
         if (!hsCodeService.idExisted(id)) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Hs_Code"));
         }
         try{
             hsCodeService.deleteRow(id);
-            return ResponseEntity.ok(msg("business.error.delete_success",id));
+            return ResponseEntity.ok(msg("business.error.delete_success",id,"Hs_Code"));
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,"Hs_Code",e.getMessage()));
         }
     }
 
@@ -79,7 +79,7 @@ public class HsCodeController {
 
         Optional<HsCode> hsId = hsCodeService.findById(id);
         if(hsId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Hs_Code"));
         }
         HsCode hs=hsId.get();
         if (hsCodeDto.getCode() == null && hsCodeDto.getName() == null) {
@@ -101,7 +101,7 @@ public class HsCodeController {
             HsCodeDtoRes hs_Code=HsCodeMapper.mapToDto(hsCodeService.save(hs));
             return ResponseEntity.status(HttpStatus.CREATED).body(hs_Code);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error","Hs_Code",e.getMessage()));
         }
     }
 }

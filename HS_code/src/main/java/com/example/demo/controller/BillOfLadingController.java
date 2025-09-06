@@ -39,18 +39,17 @@ public class BillOfLadingController {
     }
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody BillOfLadingDtoReq billOfLadingDtoReq) {
-        Optional<Companies> companieId = companiesService.findById(billOfLadingDtoReq.getAgentId());
-        if(companieId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId()));
-        }
-        Companies companie=companieId.get();
-
         BillOfLading billOfLading= BillOfLadingMapper.mapToEntity(billOfLadingDtoReq);
-        billOfLading.setAgent(companie);
-
-        if (billOfLading.getNbr() == null || billOfLading.getAgent() == null) {
+        if (billOfLading.getNbr() == null || billOfLadingDtoReq.getAgentId() == null) {
             return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
         }
+        Optional<Companies> companieId = companiesService.findById(billOfLadingDtoReq.getAgentId());
+        if(companieId.isEmpty()){
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId(),"Companies"));
+        }
+        Companies companie=companieId.get();
+        billOfLading.setAgent(companie);
+
         try{
             BillOfLadingDtoRes bolRes=BillOfLadingMapper.mapToDto(billOfLadingService.save(billOfLading));
             return ResponseEntity.status(HttpStatus.CREATED).body(bolRes);
@@ -69,7 +68,7 @@ public class BillOfLadingController {
                 result.add(billOfLadingDtoRes);
             }
             if (result.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty")); //404 not 204 to add a content
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty","Bill_Of_Lading")); //404 not 204 to add a content
             }
             return ResponseEntity.ok(result);
         }catch (Exception e) {
@@ -80,13 +79,13 @@ public class BillOfLadingController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRow(@PathVariable Long id) {
         if (!billOfLadingService.idExisted(id)) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Bill_Of_Lading"));
         }
         try{
             billOfLadingService.deleteRow(id);
-            return ResponseEntity.ok(msg("business.error.delete_success",id));
+            return ResponseEntity.ok(msg("business.error.delete_success",id,"Bill_Of_Lading"));
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,"Bill_Of_Lading",e.getMessage()));
         }
     }
 
@@ -95,7 +94,7 @@ public class BillOfLadingController {
 
         Optional<BillOfLading> billOfLadingId = billOfLadingService.findById(id);
         if(billOfLadingId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"Bill_Of_Lading"));
         }
         BillOfLading billOfLading=billOfLadingId.get();
 
@@ -105,7 +104,7 @@ public class BillOfLadingController {
         if (billOfLadingDtoReq.getNbr() == null ) {
             Optional<Companies> companieId = companiesService.findById(billOfLadingDtoReq.getAgentId());
             if(companieId.isEmpty()){
-                return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId()));
+                return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId(),"Companies"));
             }
             Companies companie=companieId.get();
             billOfLading.setAgent(companie);
@@ -117,7 +116,7 @@ public class BillOfLadingController {
         else {
             Optional<Companies> companieId = companiesService.findById(billOfLadingDtoReq.getAgentId());
             if(companieId.isEmpty()){
-                return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId()));
+                return ResponseEntity.status(404).body(msg("business.error.id_not_found",billOfLadingDtoReq.getAgentId(),"Companies"));
             }
             Companies companie=companieId.get();
 
@@ -129,7 +128,7 @@ public class BillOfLadingController {
             BillOfLadingDtoRes billOfLadingDtoRes=BillOfLadingMapper.mapToDto(billOfLadingService.save(billOfLading));
             return ResponseEntity.status(HttpStatus.CREATED).body(billOfLadingDtoRes);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error","Bill_Of_Lading",e.getMessage()));
         }
     }
 

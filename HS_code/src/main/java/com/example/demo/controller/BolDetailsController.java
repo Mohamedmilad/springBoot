@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/BolDetails")
@@ -45,24 +42,24 @@ public class BolDetailsController {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody BolDetailsDtoReq bolDetailsDtoReq) {
+        BolDetails bolDetails= BolDetailsMapper.mapToEntity(bolDetailsDtoReq);
+        if (bolDetailsDtoReq.getHsCodeId() == null || bolDetailsDtoReq.getBillOfLadingId() == null || bolDetails.getVolume() == null || bolDetails.getWeight() == null || bolDetails.getCount() == null ||bolDetails.getSerial() == null) {
+            return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
+        }
         Optional<HsCode> hsCodeId=hsCodeService.findById(bolDetailsDtoReq.getHsCodeId());
         if(hsCodeId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getHsCodeId()));
+
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getHsCodeId(),"hs_code"));
         }
         HsCode hsCode=hsCodeId.get();
         Optional<BillOfLading> billOfLadingId=billOfLadingService.findById(bolDetailsDtoReq.getBillOfLadingId());
         if(billOfLadingId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getBillOfLadingId()));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getBillOfLadingId(),"bill_of_lading"));
         }
         BillOfLading billOfLading=billOfLadingId.get();
-
-        BolDetails bolDetails= BolDetailsMapper.mapToEntity(bolDetailsDtoReq);
         bolDetails.setHsCode(hsCode);
         bolDetails.setBillOfLading(billOfLading);
 
-        if (bolDetails.getHsCode() == null || bolDetails.getBillOfLading() == null || bolDetails.getVolume() == null || bolDetails.getWeight() == null || bolDetails.getCount() == null ||bolDetails.getSerial() == null) {
-            return ResponseEntity.badRequest().body(msg("business.error.cannot_Null"));
-        }
         try{
             BolDetailsDtoRes bolRes=BolDetailsMapper.mapToDto(bolDetailsService.save(bolDetails));
             return ResponseEntity.status(HttpStatus.CREATED).body(bolRes);
@@ -81,7 +78,7 @@ public class BolDetailsController {
                 result.add(bolDetailsDtoRes);
             }
             if (result.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty")); //404 not 204 to add a content
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg("business.error.table_empty","BolDetails")); //404 not 204 to add a content
             }
             return ResponseEntity.ok(result);
         }catch (Exception e) {
@@ -92,13 +89,13 @@ public class BolDetailsController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRow(@PathVariable Long id) {
         if (!bolDetailsService.idExisted(id)) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"BolDetails"));
         }
         try{
             bolDetailsService.deleteRow(id);
-            return ResponseEntity.ok(msg("business.error.delete_success",id));
+            return ResponseEntity.ok(msg("business.error.delete_success",id,"BolDetails"));
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.delete_error",id,"BolDetails",e.getMessage()));
         }
     }
 
@@ -107,7 +104,7 @@ public class BolDetailsController {
 
         Optional<BolDetails> bolDetailsId = bolDetailsService.findById(id);
         if(bolDetailsId.isEmpty()){
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id));
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",id,"BolDetails"));
         }
         BolDetails bolDetails=bolDetailsId.get();
 
@@ -130,7 +127,7 @@ public class BolDetailsController {
         if (bolDetailsDtoReq.getHsCodeId() != null) {
             Optional<HsCode> hsCodeId = hsCodeService.findById(bolDetailsDtoReq.getHsCodeId());
             if(hsCodeId.isEmpty()){
-                return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getHsCodeId()));
+                return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getHsCodeId(),"hs_code"));
             }
             HsCode hsCode=hsCodeId.get();
             bolDetails.setHsCode(hsCode);
@@ -138,7 +135,7 @@ public class BolDetailsController {
         if (bolDetailsDtoReq.getBillOfLadingId() != null) {
             Optional<BillOfLading> billOfLadingId = billOfLadingService.findById(bolDetailsDtoReq.getBillOfLadingId());
             if(billOfLadingId.isEmpty()){
-                return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getBillOfLadingId()));
+                return ResponseEntity.status(404).body(msg("business.error.id_not_found",bolDetailsDtoReq.getBillOfLadingId(),"bill_of_lading"));
             }
             BillOfLading billOfLading=billOfLadingId.get();
             bolDetails.setBillOfLading(billOfLading);
@@ -149,7 +146,7 @@ public class BolDetailsController {
             BolDetailsDtoRes bolDetailsDtoRes=BolDetailsMapper.mapToDto(bolDetailsService.save(bolDetails));
             return ResponseEntity.status(HttpStatus.CREATED).body(bolDetailsDtoRes);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error",e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error","BolDetails",e.getMessage()));
         }
     }
 }
