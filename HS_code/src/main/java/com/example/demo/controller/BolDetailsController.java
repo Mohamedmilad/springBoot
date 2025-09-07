@@ -153,9 +153,12 @@ public class BolDetailsController {
     public ResponseEntity<?> getBySerial(@PathVariable String serial) {
         try{
             Optional<BolDetails> bolDetails=bolDetailsService.findBySerial(serial);
+            if(bolDetails.isEmpty()){
+                return ResponseEntity.status(404).body(msg("business.error.serial_not_found",serial,"BolDetails"));
+            }
             return  ResponseEntity.ok(bolDetails);
         }catch (Exception e) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",serial,"BolDetails"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.invalid_request",e.getMessage()));
         }
     }
 }

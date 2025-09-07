@@ -109,9 +109,12 @@ public class HsCodeController {
     public ResponseEntity<?> getByCode(@PathVariable String code) {
         try{
             Optional<HsCode> hs_code=hsCodeService.findByCode(code);
+            if(hs_code.isEmpty()){
+                return ResponseEntity.status(404).body(msg("business.error.code_not_found",code,"Hs_Code"));
+            }
             return  ResponseEntity.ok(hs_code);
         }catch (Exception e) {
-            return ResponseEntity.status(404).body(msg("business.error.id_not_found",code,"Hs_Code"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.invalid_request",e.getMessage()));
         }
     }
 
