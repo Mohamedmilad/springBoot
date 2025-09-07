@@ -12,4 +12,5 @@ public interface BolDetailsService {
     void deleteRow(@PathVariable Long id);
     boolean idExisted(@PathVariable Long id);
     Optional<BolDetails> findById(@PathVariable Long id);
+    Optional<BolDetails> findBySerial(@PathVariable String serial);
 }

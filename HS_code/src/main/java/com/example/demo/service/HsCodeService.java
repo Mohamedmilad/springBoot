@@ -13,4 +13,5 @@ public interface HsCodeService {
      void deleteRow(@PathVariable Long id);
      boolean idExisted(@PathVariable Long id);
     Optional<HsCode> findById(@PathVariable Long id);
+    Optional<HsCode> findByCode(@PathVariable String code);
 }

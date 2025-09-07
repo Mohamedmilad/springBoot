@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.entity.HsCode;
 import com.example.demo.repository.HsCodeRepository;
+import com.example.demo.specification.HsCodeSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -35,5 +37,9 @@ public class HsCodeServiceImplementation implements HsCodeService {
     }
     public Optional<HsCode> findById(@PathVariable Long id){
         return hsCodeRepository.findById(id);
+    }
+    public Optional<HsCode> findByCode(String code) {
+        Specification<HsCode> spec = HsCodeSpecification.hasCode(code);
+        return hsCodeRepository.findOne(spec);
     }
 }

@@ -104,4 +104,15 @@ public class HsCodeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg("business.error.update_error","Hs_Code",e.getMessage()));
         }
     }
+
+    @GetMapping("/getByCode/{code}")
+    public ResponseEntity<?> getByCode(@PathVariable String code) {
+        try{
+            Optional<HsCode> hs_code=hsCodeService.findByCode(code);
+            return  ResponseEntity.ok(hs_code);
+        }catch (Exception e) {
+            return ResponseEntity.status(404).body(msg("business.error.id_not_found",code,"Hs_Code"));
+        }
+    }
+
 }
